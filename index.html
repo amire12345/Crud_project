@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CRUD PROJECT</title>
+
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+  <style>
+    body {
+      background-color: blueviolet;
+    }
+
+    .task {
+      display: flex;
+      background-color: rgb(195, 209, 219);
+      padding: 4px;
+      border-bottom: 0 black 1px;
+      transition: box-shadow 0.2s;
+
+    }
+
+    /* .tasks {
+      white-space: nowrap;
+    } */
+
+    .task:hover {
+      box-shadow: 0px 3px 15px rgba(97, 97, 97, 0.843);
+    }
+
+    .done {
+      background-color: rgb(161, 250, 161);
+    }
+
+    .task-table {
+      width: 60%;
+      background-color: rgb(238, 247, 247);
+      /* height: 500px; */
+      margin-top: 130px;
+      padding: 0%;
+    }
+
+    button {
+      border: none;
+      font-size: 20px;
+      box-shadow: 0px 3px 5px rgba(168, 168, 168, 0.38);
+    }
+
+    button.circular {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      color: white;
+      line-height: 0;
+      padding: 0 0;
+      padding-bottom: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div style="direction: rtl;">
+    <!-- Center Div -->
+    <div style="display: flex; justify-content: center; align-items: center; padding-top: 2px;">
+
+      <!-- TASYKS TABLES -->
+      <div class="task-table">
+
+        <!-- HEADER -->
+        <div
+          style="width: 100%; text-align: center; background: rgb(92, 52, 155); color: white; padding-top: 8px; padding-bottom: 8px ;">
+          <h1 style="display: inline;">Mes Taches</h1>
+          <button id="add-btn" class="circular"
+            style="float: right; background: white; margin-right: 10px; color: black;">
+            <span class="material-symbols-outlined">
+              add
+            </span>
+          </button>
+        </div>
+        <!--/ HEADER /-->
+
+        <!-- TASKS -->
+        <div id="tasks" style="padding:  20px;">
+
+        </div>
+        <!-- TASKS -->
+
+      </div>
+      <!--/ TASYKS TABLES /-->
+
+    </div>
+    <!--/ Center Div /-->
+  </div>
+
+</body>
+
+<script>
+  let tasks = [
+    {
+      "title": "Read a Book",
+      "date": "15/11/2023",
+      "isDone": false
+    },
+    {
+      "title": "Write a Book",
+      "date": "19/10/2023",
+      "isDone": true
+    },
+    {
+      "title": "Delete a Book",
+      "date": "25/11/2023",
+      "isDone": false
+    },
+    {
+      "title": "update a Book",
+      "date": "19/10/2023",
+      "isDone": true
+    }
+  ]
+
+
+  function getTasksFromStorage() {
+    let retreiveTasks = JSON.parse(localStorage.getItem("mytasks"))
+
+    tasks = retreiveTasks ?? []
+    // if (retreiveTasks == null) {
+    //   tasks = []
+    // } else {
+    //   tasks = retreiveTasks
+    // }
+  }
+
+  getTasksFromStorage()
+
+  function fillTasksOnThePage() {
+    document.getElementById("tasks").innerHTML = ""
+
+    let index = 0
+    for (task of tasks) {
+
+      let content = `
+        <div class=" task ${task.isDone ? 'done' : ''}" style="border: 2px solid; ">
+
+            <!-- TASKS INFO -->
+            <div style="width: 70%;">
+              <h2>${task.title}</h2>
+
+              <div>
+                <span class="material-symbols-outlined">
+                  calendar_month
+                </span>
+                <span>
+                  <strong>${task.date}</strong>
+                </span>
+              </div>
+            </div>
+            <!-- TASKS INFO -->
+
+            <!-- TASKS ACTIONS -->
+            <div style="display: flex; justify-content: space-between; align-items:center;width: 20%;">
+              <button onclick="deleteTask(${index})" class="circular" style="background-color: rgb(199, 16, 16);">
+                <span class="material-symbols-outlined">
+                  delete
+                </span>
+              </button>
+
+              ${task.isDone ? `
+                <button button onclick = "toggleTaskCompletion(${index})" class="circular" style = "background-color: rgba(118, 0, 101);" >
+                   <span class="material-symbols-outlined">
+                    cancel
+                   </span>
+                 </button >
+                ` : `
+                 <button button onclick = "toggleTaskCompletion(${index})" class="circular" style = "background-color: rgb(9, 255, 0);" >
+                   <span class="material-symbols-outlined">
+                    done
+                   </span>
+                 </button >
+                `}
+              
+
+              <button onclick="editTask(${index})" class="circular" style="background-color: rgb(0, 17, 255);">
+                <span class="material-symbols-outlined">
+                  edit
+                </span>
+              </button>
+
+            </div>
+            <!-- TASKS ACTIONS -->
+          </div>
+          <!-- TASK -->
+   
+  `
+      document.getElementById("tasks").innerHTML += content
+      index++
+    }
+  }
+
+  fillTasksOnThePage()
+
+  // Add new book at the liste
+  document.getElementById("add-btn").addEventListener("click", function () {
+    let now = new Date()
+    let date = now.getDate() + "/" + (now.getMonth() + 1) + "/" + now.getFullYear()
+    let taskName = prompt("quel est ta question")
+
+    let taskObj = {
+      "title": taskName,
+      "date": date,
+      "isDone": false
+    }
+    tasks.push(taskObj)
+    storeTasks()
+    // console.log(taskObj);
+    fillTasksOnThePage()
+
+  })
+
+  //  DELETE ELEMENT IN MY ARRAY OBJECT 
+
+  function deleteTask(index) {
+    // console.log(tasks[index]);
+    let taskDelete = tasks[index]
+    // console.log(taskDelete);
+    let isConfirmed = confirm("Are You Sure To Delete:" + " " + taskDelete.title)
+
+    if (isConfirmed) {
+      tasks.splice(index, 1)
+      storeTasks()
+      fillTasksOnThePage()
+    }
+
+  }
+
+
+  function editTask(index) {
+    let task = tasks[index]
+    let newTaskTitle = prompt("Please select the new informations of:", task.title)
+
+    task.title = newTaskTitle
+    storeTasks()
+    fillTasksOnThePage()
+    // alert(newTaskName)
+  }
+
+  function toggleTaskCompletion(index) {
+    let task = tasks[index]
+    task.isDone = !task.isDone
+
+    storeTasks()
+    fillTasksOnThePage()
+  }
+
+  // ****** Storage Function *****
+
+  function storeTasks() {
+    let tasksString = JSON.stringify(tasks)
+    // console.log(tasksString);
+    localStorage.setItem("mytasks", tasksString)
+
+  }
+</script>
+
+</html>
