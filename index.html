@@ -206,14 +206,22 @@
   document.getElementById("add-btn").addEventListener("click", function () {
     let now = new Date()
     let date = now.getDate() + "/" + (now.getMonth() + 1) + "/" + now.getFullYear()
-    let taskName = prompt("quel est ta question")
+    let response = prompt("quel est ta question")
+
+    if (typeof response === "string") {
+      response = response.trim();
+    }
 
     let taskObj = {
-      "title": taskName,
+      "title": response,
       "date": date,
       "isDone": false
     }
-    tasks.push(taskObj)
+    if (response) {
+      tasks.push(taskObj)
+    } else return
+
+
     storeTasks()
     // console.log(taskObj);
     fillTasksOnThePage()
